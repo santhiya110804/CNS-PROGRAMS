@@ -1,0 +1,66 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#include <time.h>
+
+#define ALPHABET_SIZE 26
+
+void generateCipherMap(char cipherMap[ALPHABET_SIZE]);
+
+void encryptMessage(const char *plaintext, const char cipherMap[ALPHABET_SIZE], char *ciphertext);
+
+int main() {
+  
+    srand(time(NULL));
+
+    char cipherMap[ALPHABET_SIZE];
+    generateCipherMap(cipherMap);
+
+    char plaintext[1000];
+    printf("Enter the plaintext message: ");
+    fgets(plaintext, sizeof(plaintext), stdin);
+    plaintext[strcspn(plaintext, "\n")] = '\0';
+
+    char ciphertext[1000];
+    encryptMessage(plaintext, cipherMap, ciphertext);
+
+    printf("\nEncrypted Message: %s\n", ciphertext);
+
+    return 0;
+}
+
+void generateCipherMap(char cipherMap[ALPHABET_SIZE]) {
+    // Initialize the cipher map with the standard alphabet
+    for (int i = 0; i < ALPHABET_SIZE; i++) {
+        cipherMap[i] = 'A' + i;
+    }
+    for (int i = ALPHABET_SIZE - 1; i > 0; i--) {
+        int j = rand() % (i + 1);
+        char temp = cipherMap[i];
+        cipherMap[i] = cipherMap[j];
+        cipherMap[j] = temp;
+    }
+}
+
+void encryptMessage(const char *plaintext, const char cipherMap[ALPHABET_SIZE], char *ciphertext) {
+    int length = strlen(plaintext);
+
+  
+    for (int i = 0; i < length; i++) {
+        char currentChar = plaintext[i];
+
+        if (isalpha(currentChar)) {
+
+            currentChar = toupper(currentChar);
+            if (isupper(currentChar)) {
+                ciphertext[i] = cipherMap[currentChar - 'A'];
+            } else {
+                ciphertext[i] = tolower(cipherMap[currentChar - 'A']);
+            }
+        } else {
+            ciphertext[i] = currentChar;
+        }
+    }
+    ciphertext[length] = '\0';
+}
