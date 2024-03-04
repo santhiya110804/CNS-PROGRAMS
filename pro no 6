@@ -1,0 +1,56 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+long long int power(long long int base, long long int exponent, long long int modulus) {
+    long long int result = 1;
+    while (exponent > 0) {
+        if (exponent % 2 == 1)
+            result = (result * base) % modulus;
+        base = (base * base) % modulus;
+        exponent = exponent / 2;
+    }
+    return result;
+}
+
+int main() {
+    
+    long long int p = 23; 
+    long long int g = 5;  
+
+   
+    long long int a, b;
+    printf("Enter Alice's private key (a): ");
+    scanf("%lld", &a);
+    printf("Enter Bob's private key (b): ");
+    scanf("%lld", &b);
+
+   
+    long long int A = power(g, a, p);
+    long long int B = power(g, b, p);
+
+
+    printf("Alice sends her public key to Bob: %lld\n", A);
+    printf("Bob sends his public key to Alice: %lld\n", B);
+
+   
+    long long int secret_key_by_alice = power(B, a, p);
+    long long int secret_key_by_bob = power(A, b, p);
+
+   
+    printf("Shared secret key computed by Alice: %lld\n", secret_key_by_alice);
+    printf("Shared secret key computed by Bob: %lld\n", secret_key_by_bob);
+
+    return 0;
+}
+OUTPUT:
+Enter Alice's private key (a): 5
+Enter Bob's private key (b): 7
+Alice sends her public key to Bob: 20
+Bob sends his public key to Alice: 17
+Shared secret key computed by Alice: 21
+Shared secret key computed by Bob: 21
+
+--------------------------------
+Process exited after 7.377 seconds with return value 0
+Press any key to continue . . .
