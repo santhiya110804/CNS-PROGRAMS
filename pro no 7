@@ -1,0 +1,37 @@
+#include <stdio.h>
+#include <string.h>
+
+void decryptCaesar(char cipher[], int key) {
+    int i;
+    char decrypted[strlen(cipher) + 1];
+
+    for (i = 0; i < strlen(cipher); i++) {
+        // Decrypt uppercase letters
+        if (cipher[i] >= 'A' && cipher[i] <= 'Z')
+            decrypted[i] = 'A' + (cipher[i] - 'A' - key + 26) % 26;
+        // Decrypt lowercase letters
+        else if (cipher[i] >= 'a' && cipher[i] <= 'z')
+            decrypted[i] = 'a' + (cipher[i] - 'a' - key + 26) % 26;
+        // Keep non-alphabetic characters unchanged
+        else
+            decrypted[i] = cipher[i];
+    }
+    decrypted[i] = '\0';
+
+    printf("Decrypted text: %s\n", decrypted);
+}
+
+int main() {
+    char cipher[] = "PAVITHRA";
+    int key = 3;
+
+    decryptCaesar(cipher, key);
+
+    return 0;
+}
+OUTPUT:
+Decrypted text: MXSFQEOX
+
+--------------------------------
+Process exited after 0.07503 seconds with return value 0
+Press any key to continue . . .
