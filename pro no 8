@@ -1,0 +1,108 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
+// Function to generate a monoalphabetic cipher key based on a keyword
+void generateCipherKey(char keyword[], char key[]) {
+    int i, j, k;
+    char tempKey[26];
+    int keywordLength = strlen(keyword);
+    int keyLength = 0;
+
+    // Copy the keyword to the temporary key
+    for (i = 0; i < keywordLength; i++) {
+        if (isalpha(keyword[i])) {
+            char ch = toupper(keyword[i]);
+            if (strchr(tempKey, ch) == NULL) {
+                tempKey[keyLength++] = ch;
+            }
+        }
+    }
+
+    // Fill in the remaining characters of the temporary key with the alphabet
+    for (i = 0; i < 26; i++) {
+        char ch = 'A' + i;
+        if (strchr(tempKey, ch) == NULL) {
+            tempKey[keyLength++] = ch;
+        }
+    }
+
+    // Shuffle the temporary key
+    srand(1234); // Seed for consistent shuffling
+    for (i = 0; i < 26; i++) {
+        j = i + rand() % (26 - i);
+        char temp = tempKey[i];
+        tempKey[i] = tempKey[j];
+        tempKey[j] = temp;
+    }
+
+    // Copy the shuffled temporary key to the final key
+    for (i = 0; i < 26; i++) {
+        key[i] = tempKey[i];
+    }
+}
+
+// Function to encrypt plaintext using a monoalphabetic cipher
+void encrypt(char plaintext[], char key[]) {
+    int i;
+    for (i = 0; plaintext[i] != '\0'; i++) {
+        if (isalpha(plaintext[i])) {
+            if (islower(plaintext[i])) {
+                plaintext[i] = tolower(key[plaintext[i] - 'a']);
+            } else {
+                plaintext[i] = toupper(key[plaintext[i] - 'A']);
+            }
+        }
+    }
+}
+
+// Function to decrypt ciphertext using a monoalphabetic cipher
+void decrypt(char ciphertext[], char key[]) {
+    int i;
+    for (i = 0; ciphertext[i] != '\0'; i++) {
+        if (isalpha(ciphertext[i])) {
+            if (islower(ciphertext[i])) {
+                int index = strchr(key, tolower(ciphertext[i])) - key;
+                ciphertext[i] = 'a' + index;
+            } else {
+                int index = strchr(key, toupper(ciphertext[i])) - key;
+                ciphertext[i] = 'A' + index;
+            }
+        }
+    }
+}
+
+int main() {
+    char keyword[50];
+    char key[26];
+    char plaintext[100];
+    char ciphertext[100];
+
+    // Input keyword from the user
+    printf("Enter the keyword: ");
+    fgets(keyword, sizeof(keyword), stdin);
+
+    // Generate the cipher key based on the keyword
+    generateCipherKey(keyword, key);
+
+    // Input plaintext from the user
+    printf("Enter the plaintext: ");
+    fgets(plaintext, sizeof(plaintext), stdin);
+
+    // Encrypt the plaintext
+    encrypt(plaintext, key);
+    printf("Encrypted ciphertext: %s\n", plaintext);
+
+    // Decrypt the ciphertext
+    decrypt(plaintext, key);
+    printf("Decrypted plaintext: %s\n", plaintext);
+
+    return 0;
+}
+OUTPUT:
+Enter the keyword: CIPHER
+Enter the plaintext: PAVITHRA
+Encrypted ciphertext: LKGIZYWK
+
+Decrypted plaintext: PAVITHRA
