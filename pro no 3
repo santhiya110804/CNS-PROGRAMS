@@ -1,0 +1,121 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+#define SIZE 5
+
+void prepareKey(char *key, char *preparedKey);
+void generateMatrix(char *preparedKey, char matrix[SIZE][SIZE]);
+void encrypt(char matrix[SIZE][SIZE], char *plaintext);
+
+int main() {
+    char key[100];
+    char preparedKey[26];
+    char matrix[SIZE][SIZE];
+    char plaintext[1000];
+
+    printf("Enter key: ");
+    fgets(key, sizeof(key), stdin);
+
+    printf("Enter plaintext: ");
+    fgets(plaintext, sizeof(plaintext), stdin);
+
+    key[strcspn(key, "\n")] = '\0';
+    plaintext[strcspn(plaintext, "\n")] = '\0';
+
+    prepareKey(key, preparedKey);
+    generateMatrix(preparedKey, matrix);
+    encrypt(matrix, plaintext);
+
+    printf("Encrypted text: %s\n", plaintext);
+
+    return 0;
+}
+
+void prepareKey(char *key, char *preparedKey) {
+    int i, j;
+    int len = strlen(key);
+    int index = 0;
+    char table[26] = {0};
+
+    for (i = 0; i < len; i++) {
+        if (!isalpha(key[i]))
+            continue;
+
+        key[i] = tolower(key[i]);
+        if (key[i] == 'j') // Replace 'j' with 'i'
+            key[i] = 'i';
+
+        if (!table[key[i] - 'a']) {
+            preparedKey[index++] = key[i];
+            table[key[i] - 'a'] = 1;
+        }
+    }
+
+ 
+    for (i = 0; i < 26; i++) {
+        if (i + 'a' == 'j')
+            continue;
+
+        if (!table[i])
+            preparedKey[index++] = i + 'a';
+    }
+}
+
+void generateMatrix(char *preparedKey, char matrix[SIZE][SIZE]) {
+    int i, j, k = 0;
+    for (i = 0; i < SIZE; i++) {
+        for (j = 0; j < SIZE; j++) {
+            matrix[i][j] = preparedKey[k++];
+        }
+    }
+}
+
+void findPosition(char matrix[SIZE][SIZE], char ch, int *row, int *col) {
+    int i, j;
+    for (i = 0; i < SIZE; i++) {
+        for (j = 0; j < SIZE; j++) {
+            if (matrix[i][j] == ch) {
+                *row = i;
+                *col = j;
+                return;
+            }
+        }
+    }
+}
+
+void encrypt(char matrix[SIZE][SIZE], char *plaintext) {
+    int i;
+    int len = strlen(plaintext);
+    for (i = 0; i < len; i += 2) {
+        char a = plaintext[i];
+        char b = (i + 1 < len) ? plaintext[i + 1] : 'x';
+
+        if (!isalpha(a) || !isalpha(b))
+            continue;
+
+        if (a == b) {
+            b = 'x';
+            i--;
+        }
+
+        int row1, col1, row2, col2;
+        findPosition(matrix, tolower(a), &row1, &col1);
+        findPosition(matrix, tolower(b), &row2, &col2);
+
+        if (row1 == row2) {
+            plaintext[i] = matrix[row1][(col1 + 1) % SIZE];
+            plaintext[i + 1] = matrix[row2][(col2 + 1) % SIZE];
+        } else if (col1 == col2) {
+            plaintext[i] = matrix[(row1 + 1) % SIZE][col1];
+            plaintext[i + 1] = matrix[(row2 + 1) % SIZE][col2];
+        } else {
+            plaintext[i] = matrix[row1][col2];
+            plaintext[i + 1] = matrix[row2][col1];
+        }
+    }
+}
+OUTPUT:
+Enter key: hill
+Enter plaintext: pavithra
+Encrypted text: obwhqati
